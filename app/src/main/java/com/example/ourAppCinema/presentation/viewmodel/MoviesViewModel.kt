@@ -7,6 +7,7 @@ import com.example.ourAppCinema.data.api.KinopoiskApiService
 import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.api.RetrofitClient
 import com.example.ourAppCinema.data.api.RetrofitClient.instance
+import com.example.ourAppCinema.data.model.Actor
 import com.example.ourAppCinema.data.model.MovieDetails
 import com.example.ourAppCinema.presentation.FilmDetailState
 import retrofit2.Retrofit
@@ -15,12 +16,37 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.awaitResponse
 
-class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+class MoviessViewModel(private val repository: MovieRepository) : ViewModel() {
+
+    private val _movieDetail = MutableStateFlow<MovieDetails?>(null)
+    val movieDetail: StateFlow<MovieDetails?> = _movieDetail
+
+    fun fetchMovieDetails(filmId: Int) {
+        viewModelScope.launch {
+            val response = RetrofitClient.instance.getMovieDetails(filmId).awaitResponse()
+
+                if (response.isSuccessful && response.body() != null) {
+                    _movieDetail.value = response.body()
+                } else {
+                    println("errorr ${response.message()}" )
+                }
+
+        }
+
+    }
+}
+
+
+
+class MoviesViewModel : ViewModel() {
     private val _getOscarState = MutableStateFlow<List<Movie>>(emptyList())
     val getOscarState: StateFlow<List<Movie>> = _getOscarState
 
-    private val _movieDetailState = MutableStateFlow<List<MovieDetails>>((emptyList()))
+    private val _movieDetailState = MutableStateFlow<List<MovieDetails>>(emptyList())
     val movieDetailState: StateFlow<List<MovieDetails>> = _movieDetailState
+
+    private val _movieDetail = MutableStateFlow<MovieDetails?>(null)
+    val movieDetail: StateFlow<MovieDetails?> = _movieDetail
 
     private val _popularState = MutableStateFlow<List<Movie>>(emptyList())
     val popularState: StateFlow<List<Movie>> = _popularState
@@ -34,16 +60,12 @@ class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _top250State10 = MutableStateFlow<List<Movie>>(emptyList())
     val top250State10: StateFlow<List<Movie>> = _top250State10
 
+    private val _actorsState = MutableStateFlow<Actor>(Actor())
+    val actorsState: StateFlow<Actor> = _actorsState
+
     init {
         fetchMovies()
     }
-
-//    fun getFilmById(id: Int) {
-//        viewModelScope.launch {
-//            val response = RetrofitClient.instance.getMovieDetails(id).awaitResponse()
-//            _movieDetailState.value =
-//        }
-//    }
 
     fun fetchMovies() {
         viewModelScope.launch {
@@ -51,10 +73,19 @@ class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             fetchData(::fetchPopular10, _popularState10)
             fetchData(::fetchTop250, _top250State)
             fetchData(::fetchTop25010, _top250State10)
-//            fetchDataa(::fetchMovieDetail, _movieDetailState)
         }
     }
 
+    fun fetchMovieDetails(filmId: Int) {
+        viewModelScope.launch {
+            val response = RetrofitClient.instance.getMovieDetails(filmId).awaitResponse()
+            if (response.isSuccessful && response.body() != null) {
+                _movieDetail.value = response.body()
+            } else {
+                _movieDetail.value = null
+            }
+        }
+    }
 
     private suspend fun fetchData(
         fetchFunction: suspend () -> Unit,
@@ -62,9 +93,8 @@ class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     ) {
         try {
             fetchFunction()
-
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.printStackTrace() // Log the error
         }
     }
 
@@ -89,7 +119,6 @@ class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
-
     private suspend fun fetchTop250() {
         val response = RetrofitClient.instance.getTop250Movies().awaitResponse()
         if (response.isSuccessful) {
@@ -103,32 +132,16 @@ class MoviesViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             response.body()?.films?.let { _top250State10.value = it.take(10) }
         }
     }
+    fun fetchActors(filmId: Int) {
+        viewModelScope.launch {
+            val response = RetrofitClient.instance.getActor(filmId).awaitResponse()
+            if (response.isSuccessful) {
+                _actorsState.value = response.body() ?: Actor()
+            } else {
+
+            }
+        }
+    }
 }
-//    fun getMovieById(id: Int){
-//
-//        viewModelScope.launch {
-//            _movieDetailState.value = _movieDetailState.value.copy(loading = true)
-//
-//            try{
-//                var movie =
-//            }
-//
-//}
-//        class MovieUseCase {
-//            suspend fun getFilmById(id: Int): Movie {
-//                return MovieDet.getMovie(id)
-//            }
-//
-//        }        }
-//
-//class MovieRep: MovieDet {
-//    private val api = instance
-//    override suspend fun getMovieById(
-//        id: Int,
-//    ): MovieDetails {
-//        return api.getMovieById(id)
-//    }
-//}
-//interface MovieDet {
-//    suspend fun getMovieById(id: Int): MovieDetails
-//}
+
+

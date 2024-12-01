@@ -36,28 +36,6 @@ fun HomePage(navController: NavController, viewModel: MoviesViewModel = viewMode
             .background(Color.White)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Оскар 2021",
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(15.dp)
-                )
-                Text(
-                    text = "ВСЕ",
-                    color = Color.Black,
-                    fontSize = 18.sp,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .clickable {
-                            navController.navigate("list_oscar")
-                        }
-                )
-            }
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {

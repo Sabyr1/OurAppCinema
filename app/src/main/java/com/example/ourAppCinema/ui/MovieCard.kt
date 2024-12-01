@@ -27,17 +27,17 @@ import com.example.ourAppCinema.ui.theme.graphik_medium
 
 @Composable
 fun MovieCard(movie: Movie, navController: NavController) {
-
+//    println(movie.filmId)
     Card(
         modifier = Modifier
             .padding(8.dp)
             .width(160.dp)
             .height(330.dp)
-
             .clickable {
                 navController.navigate("FilmPage/${movie.filmId}")
             }
     ) {
+
         Column(
             modifier = Modifier
                 .height(330.dp)

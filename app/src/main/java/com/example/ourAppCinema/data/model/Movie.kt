@@ -25,19 +25,36 @@ data class Country(
     val country: String
 )
 data class MovieDetails(
-    val description: String,
-    val filmId: Int,
-    val rating: String?,
-    val posterUrlPreview: String,
-    val genres: List<Genre>,
-    val countries: List<Country>,
-    val shortDescription: String?,
+    val kinopoiskId: Int,
+    val imdbId: String?,
     val nameRu: String,
-    val nameEn: String,
-    val year: String,
-    val editorAnnotation: String?
-
+    val nameEn: String?,
+    val nameOriginal: String?,
+    val posterUrl: String,
+    val posterUrlPreview: String,
+    val year: Int,
+    val filmLength: Int?,
+    val description: String,
+    val ratingKinopoisk: Double?,
+    val ratingImdb: Double?,
+    val lastSync: String?,
+    val genres: List<Genre>,
+    val countries: List<Country>
 )
+//data class MovieDetails(
+//    val description: String,
+//    val filmId: Int,
+//    val rating: String?,
+//    val posterUrlPreview: String,
+//    val genres: List<Genre>,
+//    val countries: List<Country>,
+//    val shortDescription: String?,
+//    val nameRu: String,
+//    val nameEn: String,
+//    val year: String,
+//    val editorAnnotation: String?
+//
+//)
 data class MovieDetailsResponse (
     val details : List<MovieDetails>
 )

@@ -1,6 +1,8 @@
 package com.example.ourAppCinema.ui
 
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +17,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,10 +33,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.ourAppCinema.FilmPage.FilmPage
+import com.example.ourAppCinema.FilmPage.FilmPageDetail
 import com.example.ourAppCinema.presentation.Navigation.HomePage
 import com.example.ourAppCinema.presentation.Navigation.ProfilePage
 import com.example.ourAppCinema.presentation.Navigation.SearchingPage
@@ -41,8 +48,10 @@ import com.example.ourAppCinema.presentation.Navigation.All250Grid
 import com.example.ourAppCinema.R
 import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.model.MovieDetails
+import com.example.ourAppCinema.data.model.MovieDetailsResponse
 import com.example.ourAppCinema.presentation.Navigation.BottomNavigation
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
+import com.example.ourAppCinema.presentation.viewmodel.MoviessViewModel
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewModel()) {
@@ -82,24 +91,37 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
             composable("profile") {
                 ProfilePage()
             }
-            composable("FilmPage/{filmId}")
-            {
+            composable(
+                route = "FilmPage/{filmId}",
+                arguments = listOf(
+                    navArgument("filmId") {
+                        type = NavType.IntType
+                        nullable = false
+                    }
+                )
+            ) {  backStackEntry ->
 
+                val filmId = backStackEntry.arguments?.getInt("filmId")
+                if (filmId == null) {
+
+                    return@composable
                 }
+                FilmPage(navController = navController, filmId = filmId)
             }
+
         }
     }
+}
 
 
 data class NavItem (
     val icon : Painter
 )
 
-private val allMovies = mutableListOf<Movie>()
+private val allMovies = mutableListOf<MovieDetails>()
 
 fun findMovieById(filmId: Int, movies: List<MovieDetails>): MovieDetails? {
-    return movies.firstOrNull { it.filmId == filmId }
-
+    return movies.firstOrNull { it.kinopoiskId == filmId }
 
 }
 
