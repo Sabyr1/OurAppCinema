@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
 import com.example.ourAppCinema.ui.Oskars
 
 @Composable
-fun HomePage(navController: NavController, viewModel: MoviesViewModel = viewModel()) {
+fun HomePage(navController: NavHostController, viewModel: MoviesViewModel = viewModel()) {
     val popular by viewModel.popularState10.collectAsState()
     val oscar by viewModel.getOscarState.collectAsState()
     val top250 by viewModel.top250State10.collectAsState()

@@ -48,6 +48,7 @@ import com.example.ourAppCinema.presentation.Navigation.All250Grid
 import com.example.ourAppCinema.R
 import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.model.MovieDetails
+import com.example.ourAppCinema.presentation.Navigation.ActorDetailsScreen
 import com.example.ourAppCinema.presentation.Navigation.BottomNavigation
 import com.example.ourAppCinema.presentation.Navigation.GalleryAll
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
@@ -91,6 +92,11 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
             composable("profile") {
                 ProfilePage()
             }
+            composable("actorDetails/{actorId}", arguments = listOf(navArgument("actorId") { type = NavType.IntType })) { backStackEntry ->
+                val actorId = backStackEntry.arguments?.getInt("actorId") ?: 0
+                ActorDetailsScreen(actorId, navController)
+            }
+
             composable(
                 route = "FilmPage/{filmId}",
                 arguments = listOf(
@@ -108,26 +114,11 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
                 }
                 FilmPage(navController = navController, filmId = filmId)
             }
-            composable(
-                route = "galleryScreen/{filmId}",
-                        arguments = listOf(
-                        navArgument("filmId") {
-                            type = NavType.IntType
-                            nullable = false
-                        }
-                        )
-            ){backStackEntry ->
 
-                val filmId = backStackEntry.arguments?.getInt("filmId")
-                if (filmId == null) {
-
-                    return@composable
-                }
-                GalleryAll( navController , filmId = filmId)
             }
 
         }
-    }
+
 }
 
 

@@ -8,6 +8,7 @@ import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.api.RetrofitClient
 import com.example.ourAppCinema.data.api.RetrofitClient.instance
 import com.example.ourAppCinema.data.model.Actor
+import com.example.ourAppCinema.data.model.ActorDetailInfo.ActorDetail
 import com.example.ourAppCinema.data.model.Images
 import com.example.ourAppCinema.data.model.MovieDetails
 import com.example.ourAppCinema.data.model.search.SearchData
@@ -49,6 +50,10 @@ class MoviesViewModel : ViewModel() {
     private val _searchData = MutableStateFlow<SearchData?>(null)
     val searchData: StateFlow<SearchData?> = _searchData
 
+    private val _actorDetails = MutableStateFlow<ActorDetail?>(null)
+    val actorDetails: StateFlow<ActorDetail?> = _actorDetails
+
+
     init {
         fetchMovies()
     }
@@ -81,6 +86,21 @@ class MoviesViewModel : ViewModel() {
             fetchFunction()
         } catch (e: Exception) {
             e.printStackTrace() // Log the error
+        }
+    }
+
+    fun fetchActorDetails(actorId: Int) {
+        viewModelScope.launch {
+            val response = try {
+                instance.getActorDetail(actorId).awaitResponse()
+            } catch (e: Exception) {
+                null
+            }
+            if (response != null && response.isSuccessful) {
+                _actorDetails.value = response.body()
+            } else {
+                _actorDetails.value = null
+            }
         }
     }
 

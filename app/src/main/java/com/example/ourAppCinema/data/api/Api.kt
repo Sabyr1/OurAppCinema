@@ -1,6 +1,7 @@
 package com.example.ourAppCinema.data.api
 
 import com.example.ourAppCinema.data.model.Actor
+import com.example.ourAppCinema.data.model.ActorDetailInfo.ActorDetail
 import com.example.ourAppCinema.data.model.Images
 import com.example.ourAppCinema.data.model.KinopoiskResponse
 import com.example.ourAppCinema.data.model.MovieDetails
@@ -12,8 +13,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-const val API_KEY = "23b0f1f8-91a7-46cf-a70c-ac7bb8b140e0"
-//55a29254-7f72-4c93-9d0c-e4fdd7b59094
+const val API_KEY = "55a29254-7f72-4c93-9d0c-e4fdd7b59094"
+//55a29254-7f72-4c93-9d0c-e4fdd7b59094 / 23b0f1f8-91a7-46cf-a70c-ac7bb8b140e0
 interface KinopoiskApiService {
 
     @Headers("X-API-KEY: $API_KEY")
@@ -59,6 +60,10 @@ interface KinopoiskApiService {
         @Query("keyword") keyword: String,
         @Query("page") pages: Int
     ): Call<SearchData>
-
+    @Headers("X-API-KEY: $API_KEY")
+    @GET("v1/staff/{id}")
+    fun getActorDetail(
+        @Path("id") staffid : Int
+    ): Call<ActorDetail>
 
 }

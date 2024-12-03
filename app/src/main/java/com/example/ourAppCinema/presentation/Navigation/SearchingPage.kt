@@ -56,7 +56,7 @@ import coil.compose.rememberImagePainter
 import com.example.ourAppCinema.R
 import com.example.ourAppCinema.data.model.SearchedData
 import com.example.ourAppCinema.data.model.SimpleFilm
-import com.example.ourAppCinema.data.model.search.Film
+import com.example.ourAppCinema.data.model.search.Films
 import com.example.ourAppCinema.data.model.search.SearchData
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
 
@@ -143,7 +143,7 @@ fun SearchResultDisplay(searchData: SearchData? , navController: NavController) 
     } ?: Text("Start searching by typing a film name.", Modifier.padding(16.dp))
 }
 @Composable
-fun SearchResultItem(film: Film, navController: NavController) {
+fun SearchResultItem(film: Films, navController: NavController) {
     println("$film")
     Card(modifier = Modifier.fillMaxWidth().padding(8.dp)
         .clickable {
