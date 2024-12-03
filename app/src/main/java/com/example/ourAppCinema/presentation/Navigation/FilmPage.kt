@@ -3,10 +3,13 @@ package com.example.ourAppCinema.FilmPage
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,16 +19,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -45,11 +54,13 @@ import com.example.ourAppCinema.R
 import com.example.ourAppCinema.data.api.RetrofitClient
 import com.example.ourAppCinema.data.model.Actor
 import com.example.ourAppCinema.data.model.ActorItem
+import com.example.ourAppCinema.data.model.Images
 //import com.example.ourAppCinema.api.Actor
 import com.example.ourAppCinema.data.model.MovieDetails
+import com.example.ourAppCinema.presentation.Navigation.ActorsSection
+import com.example.ourAppCinema.presentation.Navigation.GallerySection
 import com.example.ourAppCinema.ui.theme.graphik_medium
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
-import com.example.ourAppCinema.presentation.viewmodel.MoviessViewModel
 
 
 @Composable
@@ -57,17 +68,20 @@ fun FilmPage(navController: NavHostController, filmId: Int ) {
     val viewModels: MoviesViewModel = viewModel()
     val movie by viewModels.movieDetail.collectAsState()
     val actor by viewModels.actorsState.collectAsState()
+    val image by viewModels.imageGallery.collectAsState()
 
     LaunchedEffect(filmId) {
         println("film page 3")
 
         viewModels.fetchMovieDetails(filmId)
         viewModels.fetchActors(filmId)
+        viewModels.fetchImages(filmId)
     }
 
     if (movie != null) {
+        FilmPageDetail(navController = navController, movie = movie!! , actors = actor , images = image)
 
-        FilmPageDetail(navController = navController, movie = movie!! , actors = actor)
+
     } else {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -79,17 +93,18 @@ fun FilmPage(navController: NavHostController, filmId: Int ) {
 }
 
     @Composable
-    fun FilmPageDetail(movie: MovieDetails, navController: NavController , actors : Actor) {
+    fun FilmPageDetail(movie: MovieDetails, navController: NavController , actors : Actor , images: Images?) {
+
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(Color.White)
         ) {
-            Column {
+            Column(modifier = Modifier ) {
                 Box(
 
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(500.dp),
+                        .height(300.dp),
                     contentAlignment = Alignment.BottomCenter,
 
                     ) {
@@ -160,9 +175,9 @@ fun FilmPage(navController: NavHostController, filmId: Int ) {
 
                     }
                 }
-                Column {
+                Column (modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "${movie.description}",
+                        text = movie.description,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
@@ -171,9 +186,14 @@ fun FilmPage(navController: NavHostController, filmId: Int ) {
 
 
                 }
-                Column(){
-                    ActorsSection(actors)
+                Column(modifier = Modifier .height(250.dp) .fillMaxWidth()) {
+                    GallerySection(images, navController)
                 }
+                Column(modifier = Modifier .fillMaxSize()){
+                    ActorsSection(actors , navController)
+                }
+                println("Before Gallery Section")
+
             }
         }
     }
@@ -183,52 +203,3 @@ fun FilmPage(navController: NavHostController, filmId: Int ) {
 
 
 
-@Composable
-fun ActorsSection(actors: Actor ) {
-
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Actors",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(actors) { actor ->
-                    ActorItem(actor = actor)
-                }
-            }
-        }
-    }
-
-
-@Composable
-fun ActorItem(actor: ActorItem) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(100.dp)
-    ) {
-        Image(
-            painter = rememberImagePainter(actor.posterUrl),
-            contentDescription = "Actor image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(80.dp)
-                .background(Color.Gray)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = actor.nameRu,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color.Black,
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1,
-        )
-    }
-}

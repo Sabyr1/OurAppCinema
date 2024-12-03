@@ -8,36 +8,15 @@ import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.api.RetrofitClient
 import com.example.ourAppCinema.data.api.RetrofitClient.instance
 import com.example.ourAppCinema.data.model.Actor
+import com.example.ourAppCinema.data.model.Images
 import com.example.ourAppCinema.data.model.MovieDetails
+import com.example.ourAppCinema.data.model.search.SearchData
 import com.example.ourAppCinema.presentation.FilmDetailState
 import retrofit2.Retrofit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.awaitResponse
-
-class MoviessViewModel(private val repository: MovieRepository) : ViewModel() {
-
-    private val _movieDetail = MutableStateFlow<MovieDetails?>(null)
-    val movieDetail: StateFlow<MovieDetails?> = _movieDetail
-
-    fun fetchMovieDetails(filmId: Int) {
-        viewModelScope.launch {
-            val response = RetrofitClient.instance.getMovieDetails(filmId).awaitResponse()
-
-                if (response.isSuccessful && response.body() != null) {
-                    _movieDetail.value = response.body()
-                } else {
-                    println("errorr ${response.message()}" )
-                }
-
-        }
-
-    }
-}
-
-
-
 class MoviesViewModel : ViewModel() {
     private val _getOscarState = MutableStateFlow<List<Movie>>(emptyList())
     val getOscarState: StateFlow<List<Movie>> = _getOscarState
@@ -62,6 +41,13 @@ class MoviesViewModel : ViewModel() {
 
     private val _actorsState = MutableStateFlow<Actor>(Actor())
     val actorsState: StateFlow<Actor> = _actorsState
+
+    private val _imageGallery = MutableStateFlow<Images?>(null)
+    val imageGallery: StateFlow<Images?> = _imageGallery
+
+
+    private val _searchData = MutableStateFlow<SearchData?>(null)
+    val searchData: StateFlow<SearchData?> = _searchData
 
     init {
         fetchMovies()
@@ -132,6 +118,7 @@ class MoviesViewModel : ViewModel() {
             response.body()?.films?.let { _top250State10.value = it.take(10) }
         }
     }
+
     fun fetchActors(filmId: Int) {
         viewModelScope.launch {
             val response = RetrofitClient.instance.getActor(filmId).awaitResponse()
@@ -142,6 +129,54 @@ class MoviesViewModel : ViewModel() {
             }
         }
     }
+
+    fun fetchImages(filmId: Int) {
+        viewModelScope.launch {
+            val response = RetrofitClient.instance.getImages(filmId).awaitResponse()
+            if (response.isSuccessful) {
+                _imageGallery.value = response.body()
+            } else {
+                _imageGallery.value = null
+            }
+        }
+    }
+
+    fun searchFilms(keyword: String) {
+        viewModelScope.launch {
+            val response = instance.getSearching(keyword, 1).awaitResponse()
+            if (response.isSuccessful && response.body()?.films?.isNotEmpty() == true) {
+                _searchData.value = response.body()
+            } else {
+                _searchData.value = null // Indicate no results found
+            }
+        }
+        fun applyFilters(keyword: String, genre: String, country: String) {
+            // Re-fetch with additional filter parameters
+            searchFilms(keyword) // Simplified for illustration
+        }
+    }
+        fun searchFilmsByKeyword(keyword: String) {
+            viewModelScope.launch {
+                val filmResponse = RetrofitClient.instance.getSearching(keyword, 1)
+                    .awaitResponse()
+
+                if (filmResponse.isSuccessful && filmResponse.body() != null) {
+                    _searchData.value = filmResponse.body()
+                } else {
+                    _searchData.value = null
+                }
+            }
+        }
+
+//    fun applyFilters(country: String, genre: String, yearRange: IntRange, rating: Float) {
+//
+//        viewModelScope.launch {
+//            val filteredFilms = instance.getFilteredFilms(country, genre, yearRange, rating)
+//            // Assuming `_searchData` holds the data to be displayed
+//            _searchData.value = SearchData(filteredFilms)
+//        }
+//    }
+
 }
 
 

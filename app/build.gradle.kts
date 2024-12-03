@@ -91,6 +91,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.1.0")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.ui.test.android)
 
     // Тестирование
     testImplementation(libs.junit)

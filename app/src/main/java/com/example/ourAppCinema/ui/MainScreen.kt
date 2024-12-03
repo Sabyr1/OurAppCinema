@@ -48,10 +48,9 @@ import com.example.ourAppCinema.presentation.Navigation.All250Grid
 import com.example.ourAppCinema.R
 import com.example.ourAppCinema.data.model.Movie
 import com.example.ourAppCinema.data.model.MovieDetails
-import com.example.ourAppCinema.data.model.MovieDetailsResponse
 import com.example.ourAppCinema.presentation.Navigation.BottomNavigation
+import com.example.ourAppCinema.presentation.Navigation.GalleryAll
 import com.example.ourAppCinema.presentation.viewmodel.MoviesViewModel
-import com.example.ourAppCinema.presentation.viewmodel.MoviessViewModel
 
 @Composable
 fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewModel()) {
@@ -61,6 +60,7 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
     val oscar by viewModel.getOscarState.collectAsState()
     val top250 by viewModel.top250State10.collectAsState()
     val movies by viewModel.movieDetailState.collectAsState()
+    val images by viewModel.imageGallery.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -86,7 +86,7 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
                 All250Grid(navController = navController)
             }
             composable("searching") {
-                SearchingPage()
+                SearchingPage(viewModel,navController )
             }
             composable("profile") {
                 ProfilePage()
@@ -108,41 +108,32 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
                 }
                 FilmPage(navController = navController, filmId = filmId)
             }
+            composable(
+                route = "galleryScreen/{filmId}",
+                        arguments = listOf(
+                        navArgument("filmId") {
+                            type = NavType.IntType
+                            nullable = false
+                        }
+                        )
+            ){backStackEntry ->
+
+                val filmId = backStackEntry.arguments?.getInt("filmId")
+                if (filmId == null) {
+
+                    return@composable
+                }
+                GalleryAll( navController , filmId = filmId)
+            }
 
         }
     }
 }
 
 
-data class NavItem (
+data class  NavItem (
     val icon : Painter
 )
 
-private val allMovies = mutableListOf<MovieDetails>()
-
-fun findMovieById(filmId: Int, movies: List<MovieDetails>): MovieDetails? {
-    return movies.firstOrNull { it.kinopoiskId == filmId }
-
-}
 
 
-
-
-
-
-//fun findMovieById(filmId: String?, popular: List<Movie>, premieres: List<Movie>, top250: List<Movie>): Movie? {
-//    return popular.firstOrNull { it.filmId.toString() == filmId }
-//        ?: premieres.firstOrNull { it.filmId.toString() == filmId }
-//        ?: top250.firstOrNull { it.filmId.toString() == filmId }
-//}
-
-
-
-//val filmId = backStackEntry.arguments?.getString("filmId")
-//val movie = findMovieById(filmId, popular, premieres, top250)
-//if (movie != null) {
-//    FilmPage(movie = movie, navController = navController)
-//} else {
-//    Text(
-//        text = "Error: Movie not found"
-//    )

@@ -41,20 +41,3 @@ data class MovieDetails(
     val genres: List<Genre>,
     val countries: List<Country>
 )
-//data class MovieDetails(
-//    val description: String,
-//    val filmId: Int,
-//    val rating: String?,
-//    val posterUrlPreview: String,
-//    val genres: List<Genre>,
-//    val countries: List<Country>,
-//    val shortDescription: String?,
-//    val nameRu: String,
-//    val nameEn: String,
-//    val year: String,
-//    val editorAnnotation: String?
-//
-//)
-data class MovieDetailsResponse (
-    val details : List<MovieDetails>
-)
