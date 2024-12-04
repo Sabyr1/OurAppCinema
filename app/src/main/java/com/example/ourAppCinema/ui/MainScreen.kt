@@ -90,7 +90,7 @@ fun MainScreen(modifier: Modifier = Modifier,viewModel: MoviesViewModel = viewMo
                 SearchingPage(viewModel,navController )
             }
             composable("profile") {
-                ProfilePage()
+                ProfilePage(viewModel , navController)
             }
             composable("actorDetails/{actorId}", arguments = listOf(navArgument("actorId") { type = NavType.IntType })) { backStackEntry ->
                 val actorId = backStackEntry.arguments?.getInt("actorId") ?: 0

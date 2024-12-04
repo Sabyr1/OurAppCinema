@@ -140,7 +140,7 @@ fun SearchResultDisplay(searchData: SearchData? , navController: NavController) 
         } else {
             Text("К сожалению , по вашему запросу ничего не найдено.", Modifier.padding(16.dp) , color = Color.Black)
         }
-    } ?: Text("Start searching by typing a film name.", Modifier.padding(16.dp))
+    } ?: Text("", Modifier.padding(16.dp))
 }
 @Composable
 fun SearchResultItem(film: Films, navController: NavController) {
